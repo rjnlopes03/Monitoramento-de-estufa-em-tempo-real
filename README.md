@@ -224,4 +224,4 @@ sobrescritos por variável de ambiente:
 ## 👤 Autor
 
 Projeto desenvolvido para a disciplina de Redes de Computadores — desafio
-proposto pelo Prof. Silvio.
+proposto pelo Professor Silvio Ereno Quincozes
