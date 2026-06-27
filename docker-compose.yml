@@ -1,0 +1,19 @@
+# Broker MQTT local (opcional).
+# Use quando quiser rodar o projeto sem depender do broker público:
+#   docker compose up -d
+#   set MQTT_HOST=localhost   (Windows PowerShell: $env:MQTT_HOST="localhost")
+#
+# Sem Docker? O projeto já funciona apontando para o broker público
+# definido em src/config.py (broker.hivemq.com).
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: estufa-mosquitto
+    ports:
+      - "1883:1883"   # MQTT
+      - "9001:9001"   # MQTT sobre WebSocket
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    restart: unless-stopped
