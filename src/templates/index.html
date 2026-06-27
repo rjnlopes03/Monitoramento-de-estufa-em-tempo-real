@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitoramento de Estufa · MQTT</title>
+  <style>
+    :root { --bg:#0f172a; --card:#1e293b; --ok:#22c55e; --warn:#ef4444; --muted:#94a3b8; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+           background:var(--bg); color:#e2e8f0; }
+    header { padding:24px 32px; border-bottom:1px solid #334155; }
+    h1 { margin:0 0 4px; font-size:22px; }
+    header small { color:var(--muted); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr));
+            gap:16px; padding:24px 32px; }
+    .card { background:var(--card); border-radius:14px; padding:18px;
+            border:1px solid #334155; transition:.2s; }
+    .card.alerta { border-color:var(--warn); box-shadow:0 0 0 1px var(--warn); }
+    .card h3 { margin:0 0 2px; font-size:16px; }
+    .card .setor { color:var(--muted); font-size:12px; margin-bottom:12px; }
+    .metric { display:flex; justify-content:space-between; align-items:baseline; margin:6px 0; }
+    .metric .v { font-size:24px; font-weight:700; }
+    .tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:999px; }
+    .tag.ok { background:rgba(34,197,94,.15); color:var(--ok); }
+    .tag.warn { background:rgba(239,68,68,.15); color:var(--warn); }
+    .alertmsg { color:var(--warn); font-size:12px; margin-top:10px; }
+    footer { color:var(--muted); font-size:12px; padding:16px 32px; border-top:1px solid #334155; }
+    .empty { padding:48px 32px; color:var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌱 Monitoramento de Estufa em Tempo Real</h1>
+    <small>Broker MQTT: <code>{{ broker }}</code> · Tópico: <code>{{ prefixo }}/#</code></small>
+  </header>
+
+  <div id="cards" class="grid"></div>
+  <div id="empty" class="empty">Aguardando leituras dos sensores… inicie o <code>sensor_publisher.py</code>.</div>
+
+  <footer>Atualização automática a cada 2s · Desafio de Redes — Prof. Silvio</footer>
+
+  <script>
+    async function atualizar() {
+      try {
+        const r = await fetch('/api/estado');
+        const data = await r.json();
+        const cards = document.getElementById('cards');
+        const empty = document.getElementById('empty');
+        const sensores = data.sensores || [];
+
+        empty.style.display = sensores.length ? 'none' : 'block';
+        cards.innerHTML = sensores.map(s => {
+          const alerta = (s.alertas && s.alertas.length) ? 'alerta' : '';
+          const tag = alerta
+            ? '<span class="tag warn">⚠ alerta</span>'
+            : '<span class="tag ok">✓ ok</span>';
+          const msg = (s.alertas && s.alertas.length)
+            ? `<div class="alertmsg">${s.alertas.join('<br>')}</div>` : '';
+          return `
+            <div class="card ${alerta}">
+              <h3>${s.sensor_id} ${tag}</h3>
+              <div class="setor">${s.setor}</div>
+              <div class="metric"><span>🌡️ Temperatura</span><span class="v">${s.temperatura}°C</span></div>
+              <div class="metric"><span>💧 Umidade</span><span class="v">${s.umidade}%</span></div>
+              ${msg}
+            </div>`;
+        }).join('');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    atualizar();
+    setInterval(atualizar, 2000);
+  </script>
+</body>
+</html>
