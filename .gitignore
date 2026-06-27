@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Banco de dados local gerado em runtime
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+# Logs
+*.log
+
+# Sistema operacional / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Material pessoal (nao faz parte do projeto)
+LINKEDIN.md
