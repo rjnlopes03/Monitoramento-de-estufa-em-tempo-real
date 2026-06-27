@@ -1,0 +1,3 @@
+# Dependências do projeto de monitoramento IoT via MQTT
+paho-mqtt>=2.1.0
+Flask>=3.0.0
